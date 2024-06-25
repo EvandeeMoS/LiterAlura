@@ -18,4 +18,9 @@ public class ApiConsumer {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    public String findBook(String title) {
+        String url = "https://gutendex.com/books/?search=" + title.toLowerCase().replace(" ", "%20");
+        return fetch(url);
+    }
 }
