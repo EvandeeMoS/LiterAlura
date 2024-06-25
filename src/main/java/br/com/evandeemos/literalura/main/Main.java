@@ -1,17 +1,28 @@
 package br.com.evandeemos.literalura.main;
 
 import br.com.evandeemos.literalura.dto.GutendexResWrapper;
+import br.com.evandeemos.literalura.model.Book;
 import br.com.evandeemos.literalura.model.Language;
+import br.com.evandeemos.literalura.repository.AuthorRepository;
+import br.com.evandeemos.literalura.repository.BookRepository;
 import br.com.evandeemos.literalura.service.ApiConsumer;
 import br.com.evandeemos.literalura.service.JsonParser;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    ApiConsumer httpSerice = new ApiConsumer();
-    JsonParser jsonParser = new JsonParser();
-    Scanner input = new Scanner(System.in);
+    private ApiConsumer httpSerice = new ApiConsumer();
+    private JsonParser jsonParser = new JsonParser();
+    private Scanner input = new Scanner(System.in);
+    private BookRepository bookRepository;
+    private AuthorRepository authorRepository;
+
+    public Main(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
 
     public void run() {
         menu();
@@ -81,31 +92,42 @@ public class Main {
         System.out.println("Escreva o título do livro: ");
         String bookTitle = input.nextLine();
         System.out.println("Buscando...");
-        System.out.println(jsonParser.fromJson(httpSerice.findBook(bookTitle), GutendexResWrapper.class).books().getFirst());
+        Book book = new Book(jsonParser.fromJson(httpSerice.findBook(bookTitle), GutendexResWrapper.class).books().getFirst());
+        System.out.println(book);
+        authorRepository.save(book.getAuthor());
+        bookRepository.save(book);
     }
 
     public void listBooks() {
         System.out.println("Coletando dados...");
-        System.out.println("livro");
+        List<Book> Books = bookRepository.findAll();
+        if (!Books.isEmpty()) {
+            Books.forEach(System.out::println);
+        }
+        else {
+            System.out.println("Nenhum livro foi pesquisado...");
+        }
     }
 
     public void listBooksByLanguage(Language language) {
         System.out.println("Coletando dados...");
-        System.out.println("Livros coletados escritos em " + language.getLanguageName());
+        bookRepository.findAllByLanguage(language).forEach(System.out::println);
     }
 
     public void listAuthors() {
         System.out.println("Coletando dados...");
-        System.out.println("Autores");
+        authorRepository.findAll().forEach(System.out::println);
     }
 
     public void listAuthorsByPeriod(Integer begin, Integer end) {
         System.out.println("Coletando dados...");
-        System.out.println("Autores do periodo");
+        authorRepository.findAuthorsAliveInPeriod(begin, end)
+                .forEach(System.out::println);
     }
 
     private int convertYear(String year) {
-        return Integer.valueOf(year.contains("AC") || year.contains("BC") ?
-                "-" + year.trim().replaceAll("\\D+", "") : year);
+        String yearUpper = year.toUpperCase();
+        return Integer.valueOf(yearUpper.contains("AC") || yearUpper.contains("BC") ?
+                "-" + yearUpper.trim().replaceAll("\\D+", "") : yearUpper);
     }
 }
