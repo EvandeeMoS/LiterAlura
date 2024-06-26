@@ -1,6 +1,7 @@
 package br.com.evandeemos.literalura.main;
 
 import br.com.evandeemos.literalura.dto.GutendexResWrapper;
+import br.com.evandeemos.literalura.model.Author;
 import br.com.evandeemos.literalura.model.Book;
 import br.com.evandeemos.literalura.model.Language;
 import br.com.evandeemos.literalura.repository.AuthorRepository;
@@ -9,7 +10,6 @@ import br.com.evandeemos.literalura.service.ApiConsumer;
 import br.com.evandeemos.literalura.service.JsonParser;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -39,8 +39,10 @@ public class Main {
                   1 - Registrar Livro
                   2 - Consultar Livro
                   3 - Listar Livros por idioma
-                  4 - Consultar Autor
-                  5 - Listar autores por período
+                  4 - Consultar Autor pelo nome
+                  5 - Listar todos os autores
+                  6 - Listar autores por período
+                  7 - Top 10 livros mais baixados
                 
                   0 - Sair da aplicação
                 ===================================
@@ -52,8 +54,10 @@ public class Main {
                 case 1 -> findBook();
                 case 2 -> listBooks();
                 case 3 -> listBooksByLanguage();
-                case 4 -> listAuthors();
-                case 5 -> listAuthorsByPeriod();
+                case 4 -> listAutorByName();
+                case 5 -> listAuthors();
+                case 6 -> listAuthorsByPeriod();
+                case 7 -> listTop10BooksByDownloads();
                 case 0 -> {
                     running = false;
                     continue;
@@ -64,7 +68,7 @@ public class Main {
         }
     }
 
-    public void findBook() {
+    private void findBook() {
         System.out.println("Escreva o título do livro: ");
         String bookTitle = input.nextLine();
         System.out.println("Buscando...");
@@ -74,7 +78,7 @@ public class Main {
         bookRepository.save(book);
     }
 
-    public void listBooks() {
+    private void listBooks() {
         System.out.println("Coletando dados...");
         List<Book> Books = bookRepository.findAll();
         if (!Books.isEmpty()) {
@@ -85,7 +89,7 @@ public class Main {
         }
     }
 
-    public void listBooksByLanguage() {
+    private void listBooksByLanguage() {
         System.out.println("""
             Insira o idioma desejado:
             1 - Português;
@@ -96,19 +100,29 @@ public class Main {
             int option = Integer.valueOf(input.nextLine());
             Language language = Language.fromLanguageValue(option);
             System.out.println("Coletando dados...");
-            bookRepository.findAllByLanguage(language).forEach(System.out::println);
+            List<Book> books = bookRepository.findAllByLanguage(language);
+            System.out.println("Livros escontrados no idioma " + language.getLanguageName());
+            books.forEach(System.out::println);
         }
         catch (IllegalArgumentException e) {
             System.out.println("insira um valor válido");
         }
     }
 
-    public void listAuthors() {
+    private void listTop10BooksByDownloads() {
+        List<Book> books = bookRepository.findTop10ByOrderByDownloadCountDesc();
+        System.out.println("Top 10 mais baixados");
+        for (int i = 0; i < books.size(); i++) {
+            System.out.println((i + 1) + " - " + books.get(i));
+        }
+    }
+
+    private void listAuthors() {
         System.out.println("Coletando dados...");
         authorRepository.findAll().forEach(System.out::println);
     }
 
-    public void listAuthorsByPeriod() {
+    private void listAuthorsByPeriod() {
         try {
             System.out.println("Insira o ano inícial do período: \n" +
                     "modelo: 1999 ou 300AC ou 800BC");
@@ -116,12 +130,22 @@ public class Main {
             System.out.println("Insira o ano final do período: ");
             int end = convertYear(input.nextLine());
             System.out.println("Coletando dados...");
-            authorRepository.findAuthorsAliveInPeriod(begin, end)
-                    .forEach(System.out::println);
+            List<Author> authors = authorRepository.findAuthorsAliveInPeriod(begin, end);
+            System.out.println("Autores vivos no periodo de: " + (begin >= 0 ? begin : (begin * -1) + "AC") + " - " +
+                    (end >= 0 ? end : (end * -1) + "AC"));
+            authors.forEach(System.out::println);
         }
         catch (NumberFormatException e) {
             System.out.println("Por favor, insira um ano válido");
         }
+    }
+
+    private void listAutorByName() {
+        System.out.println("Insira o nome do autor: ");
+        String name = input.nextLine();
+        List<Author> authors = authorRepository.findByNameContainingIgnoreCase(name);
+        System.out.println("Autores encontrados com nome similar: ");
+        authors.forEach(System.out::println);
     }
 
     private int convertYear(String year) {

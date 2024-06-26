@@ -9,4 +9,5 @@ import java.util.List;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
     @Query("SELECT a FROM Author a WHERE a.birthYear >= :begin AND a.birthYear <= :end OR a.deathYear >= :begin AND a.deathYear <= :end")
     List<Author> findAuthorsAliveInPeriod(int begin, int end);
+    List<Author> findByNameContainingIgnoreCase(String name);
 }

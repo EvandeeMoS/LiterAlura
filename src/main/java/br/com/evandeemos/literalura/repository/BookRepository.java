@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllByLanguage(Language language);
+    List<Book> findTop10ByOrderByDownloadCountDesc();
 }
