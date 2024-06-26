@@ -40,7 +40,7 @@ public enum Language {
             return optLanguage.get();
         }
         else {
-            throw new IllegalArgumentException("Insira um valor válido");
+            throw new IllegalArgumentException();
         }
     }
 }

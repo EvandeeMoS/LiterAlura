@@ -9,6 +9,7 @@ import br.com.evandeemos.literalura.service.ApiConsumer;
 import br.com.evandeemos.literalura.service.JsonParser;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -50,34 +51,9 @@ public class Main {
             switch (option) {
                 case 1 -> findBook();
                 case 2 -> listBooks();
-                case 3 -> {
-                    System.out.println("""
-                            Insira o idioma desejado:
-                            1 - Português;
-                            2 - Inglês;
-                            3 - Françês;""");
-                    option = Integer.valueOf(input.nextLine());
-                    try {
-                        listBooksByLanguage(Language.fromLanguageValue(option));
-                    }
-                    catch (IllegalArgumentException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
+                case 3 -> listBooksByLanguage();
                 case 4 -> listAuthors();
-                case 5 -> {
-                    try {
-                        System.out.println("Insira o ano inícial do período: ");
-                        System.out.println("modelo: 1999 ou 300AC ou 800BC");
-                        int begin = convertYear(input.nextLine());
-                        System.out.println("Insira o ano final do período: ");
-                        int end = convertYear(input.nextLine());
-                        listAuthorsByPeriod(begin, end);
-                    }
-                    catch (NumberFormatException e) {
-                        System.out.println("Por favor, insíra um ano válido");
-                    }
-                }
+                case 5 -> listAuthorsByPeriod();
                 case 0 -> {
                     running = false;
                     continue;
@@ -109,9 +85,22 @@ public class Main {
         }
     }
 
-    public void listBooksByLanguage(Language language) {
-        System.out.println("Coletando dados...");
-        bookRepository.findAllByLanguage(language).forEach(System.out::println);
+    public void listBooksByLanguage() {
+        System.out.println("""
+            Insira o idioma desejado:
+            1 - Português;
+            2 - Inglês;
+            3 - Françês;
+            """);
+        try {
+            int option = Integer.valueOf(input.nextLine());
+            Language language = Language.fromLanguageValue(option);
+            System.out.println("Coletando dados...");
+            bookRepository.findAllByLanguage(language).forEach(System.out::println);
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println("insira um valor válido");
+        }
     }
 
     public void listAuthors() {
@@ -119,10 +108,20 @@ public class Main {
         authorRepository.findAll().forEach(System.out::println);
     }
 
-    public void listAuthorsByPeriod(Integer begin, Integer end) {
-        System.out.println("Coletando dados...");
-        authorRepository.findAuthorsAliveInPeriod(begin, end)
-                .forEach(System.out::println);
+    public void listAuthorsByPeriod() {
+        try {
+            System.out.println("Insira o ano inícial do período: \n" +
+                    "modelo: 1999 ou 300AC ou 800BC");
+            int begin = convertYear(input.nextLine());
+            System.out.println("Insira o ano final do período: ");
+            int end = convertYear(input.nextLine());
+            System.out.println("Coletando dados...");
+            authorRepository.findAuthorsAliveInPeriod(begin, end)
+                    .forEach(System.out::println);
+        }
+        catch (NumberFormatException e) {
+            System.out.println("Por favor, insira um ano válido");
+        }
     }
 
     private int convertYear(String year) {
