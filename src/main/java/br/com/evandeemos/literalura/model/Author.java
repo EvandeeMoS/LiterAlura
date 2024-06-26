@@ -74,11 +74,11 @@ public class Author {
 
     @Override
     public String toString() {
-        return "Author{" +
-                "name='" + name + '\'' +
-                ", birthYear=" + birthYear +
-                ", deathYear=" + deathYear +
-                '}';
+        return "Autor [\n" +
+                "  Nome: " + name + "\n" +
+                "  Ano de nascimento: " + birthYear + "\n" +
+                "  Ano de falecimento: " + deathYear + "\n" +
+                "]";
     }
 
     @Override

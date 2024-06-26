@@ -100,15 +100,9 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", authors=" + author +
-                ", subjects=" + subjects +
-                ", languages=" + language +
-                ", copyright='" + copyright + '\'' +
-                ", downloadCount=" + downloadCount +
-                '}';
+        return "Livro [" + "\n" + "  Titulo: " + title + "\n" +
+                "  Autor: " + author.getName() + ".  Idioma: " + language + "\n" +
+                "  Downloads: " + downloadCount + "\n" + "]";
     }
 
     @Override
