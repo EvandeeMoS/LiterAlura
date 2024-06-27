@@ -3,6 +3,8 @@
 Esse projeto é uma aplicação de terminal que busca dados sobre livros através de uma API e salva essas informações num banco de dados PostgreSQL.
 É um projeto proposto pela Alura em sua trilha de estudos para o projeto Oracle Next Education, com o intuito de praticar e fixar conteúdos relacionados a JPA, o básico de Spring, consumo de APIs e converção dos dados retornados pela API.
 
+<img style="display: block" src="readme/search-book.gif" alt="Aplicação rodando em terminal, pesquisando livro por nome numa api">
+
 ## Status do projeto
 
 O projeto está completado e tem sua versão 1.0 no atual commit, embora que, pretendo aplicar algumas alterações no futuro, incluindo talvez tranformar em uma applicaçãO REST e implementar um frontend.
