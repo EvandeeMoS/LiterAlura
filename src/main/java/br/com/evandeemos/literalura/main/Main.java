@@ -10,6 +10,7 @@ import br.com.evandeemos.literalura.service.ApiConsumer;
 import br.com.evandeemos.literalura.service.JsonParser;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Main {
@@ -70,12 +71,17 @@ public class Main {
 
     private void findBook() {
         System.out.println("Escreva o título do livro: ");
-        String bookTitle = input.nextLine();
-        System.out.println("Buscando...");
-        Book book = new Book(jsonParser.fromJson(httpSerice.findBook(bookTitle), GutendexResWrapper.class).books().getFirst());
-        System.out.println(book);
-        authorRepository.save(book.getAuthor());
-        bookRepository.save(book);
+        try {
+            String bookTitle = input.nextLine();
+            System.out.println("Buscando...");
+            Book book = new Book(jsonParser.fromJson(httpSerice.findBook(bookTitle), GutendexResWrapper.class).books().getFirst());
+            System.out.println(book);
+            authorRepository.save(book.getAuthor());
+            bookRepository.save(book);
+        }
+        catch (NoSuchElementException e) {
+            System.out.println("Livro não econtrado!");
+        }
     }
 
     private void listBooks() {
